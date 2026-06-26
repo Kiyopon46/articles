@@ -69,6 +69,7 @@
         }
         .dlc-banner {
             max-width: 240px;
+            width: 100%; /* 親要素の幅に合わせて縮むようにする */
             height: auto;
             border-radius: 4px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -94,6 +95,28 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             padding: 6px;
+        }
+        /* ★スマホ向けのレスポンシブ対応設定を追加 */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 5px; /* 全体の余白を狭く */
+            }
+            .container {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 18px;
+            }
+            table.dataTable tbody td {
+                padding: 8px 4px; /* セルの余白を最小限に */
+                font-size: 12px;  /* 文字を少し小さく */
+            }
+            .price-cell {
+                font-size: 13px;  /* 価格の文字も少し小さく */
+            }
+            .dlc-banner {
+                max-width: 120px; /* スマホでは画像をさらに小ぶりに */
+            }
         }
     </style>
 </head>
