@@ -25,7 +25,7 @@
         h1 {
             font-size: 24px;
             color: #1f4e78;
-            margin-bottom: 5px;
+            margin-bottom: 1rem;
             text-align: center;
         }
         .subtitle {
@@ -33,6 +33,9 @@
             color: #666;
             margin-bottom: 30px;
             font-size: 14px;
+        }
+        .no-break {
+          white-space: nowrap;
         }
         table.dataTable {
             width: 100% !important;
@@ -96,6 +99,141 @@
             border-radius: 4px;
             padding: 6px;
         }
+
+        /* キャラクターボタンのコンテナ */
+        .filter-container {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .char-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* おしゃれなトグルボタンのベース設定 */
+        .char-btn {
+            background-color: #ffffff;
+            color: #1f4e78;
+            border: 2px solid #1f4e78;
+            padding: 6px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .char-btn:hover {
+            background-color: #f0f4f8;
+        }
+
+        /* ボタンが押されている（アクティブ）状態 */
+        .char-btn.active {
+            background-color: #1f4e78;
+            color: #ffffff;
+        }
+
+        /* AND/OR 切り替えスイッチのスタイル */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #1f4e78; /* OR側の色（ネイビー） */
+            transition: .3s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "OR";
+            height: 22px;
+            width: 32px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #1f4e78;
+            text-align: center;
+            line-height: 22px;
+        }
+
+        /* ANDに切り替わった時のスタイル */
+        input:checked + .slider {
+            background-color: #d9534f; /* AND側の色（マゼンタ/レッド系） */
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+            content: "AND";
+            color: #d9534f;
+        }
+
+        /* キャラクターフィルター開閉ボタンのスタイル */
+        .toggle-filter-btn {
+            background-color: #ffffff;
+            color: #1f4e78;
+            border: 1px solid #1f4e78;
+            padding: 8px 24px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .toggle-filter-btn:hover {
+            background-color: #1f4e78;
+            color: #ffffff;
+        }
+
+        /* フィルターが開いている状態のボタンスタイル */
+        .toggle-filter-btn.active {
+            background-color: #e2e8f0;
+            color: #333;
+            border-color: #cbd5e1;
+        }
+
+        /* 検索専用の非表示テキスト（画面には出ないが検索対象には含まれる） */
+        .search-only {
+            display: none;
+        }
+
         /* ★スマホ向けのレスポンシブ対応設定を追加 */
         @media screen and (max-width: 768px) {
             body {
@@ -117,13 +255,81 @@
             .dlc-banner {
                 max-width: 120px; /* スマホでは画像をさらに小ぶりに */
             }
+            .char-btn {
+                font-size: 12px; /* キャラクター名の大きさ */
+            }
+            .switch-container {
+                font-size: 12px; /* 結合条件 文言の大きさ */
+            }
+            .slider:before {
+                font-size: 11px; /* AND/OR 文言の大きさ*/
+            }
+            .toggle-filter-btn {
+                width: 100%; /* スマホでは押しやすいように横幅いっぱいに */
+                font-size: 13px;
+                padding: 10px;
+            }
         }
+
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>DEAD OR ALIVE 6 Last Round<br>DLC 一覧</h1>
+    <h1><span class="no-break">DEAD OR ALIVE 6</span> <span class="no-break">Last Round</span> <span class="no-break">DLC List</span></h1>
+
+    <!-- ↓↓↓ ここを追加：開閉用のトリガーボタン ↓↓↓ -->
+    <div style="text-align: center; margin-bottom: 15px;">
+        <button type="button" id="toggleFilterBtn" class="toggle-filter-btn">
+            キャラクターフィルターを表示する ▾
+        </button>
+    </div>
+
+    <div class="filter-container" style="display: none;">
+        <!-- キャラクター選択ボタン（複数選択可能） -->
+        <div class="char-buttons">
+            <button type="button" class="char-btn" data-char="かすみ">かすみ</button>
+            <button type="button" class="char-btn" data-char="マリー・ローズ">マリー・ローズ</button>
+            <button type="button" class="char-btn" data-char="ほのか">ほのか</button>
+            <button type="button" class="char-btn" data-char="NiCO">NiCO</button>
+            <button type="button" class="char-btn" data-char="女天狗">女天狗</button>
+            <button type="button" class="char-btn" data-char="フェーズ4">フェーズ4</button>
+            <button type="button" class="char-btn" data-char="たまき">たまき</button>
+            <button type="button" class="char-btn" data-char="紅葉">紅葉</button>
+            <button type="button" class="char-btn" data-char="レイチェル">レイチェル</button>
+            <button type="button" class="char-btn" data-char="エレナ">エレナ</button>
+            <button type="button" class="char-btn" data-char="ハヤテ">ハヤテ</button>
+            <button type="button" class="char-btn" data-char="リュウ・ハヤブサ">リュウ・ハヤブサ</button>
+            <button type="button" class="char-btn" data-char="ジャン・リー">ジャン・リー</button>
+            <button type="button" class="char-btn" data-char="ザック">ザック</button>
+            <button type="button" class="char-btn" data-char="ディエゴ">ディエゴ</button>
+            <button type="button" class="char-btn" data-char="リグ">リグ</button>
+            <button type="button" class="char-btn" data-char="ヒトミ">ヒトミ</button>
+            <button type="button" class="char-btn" data-char="レイファン">レイファン</button>
+            <button type="button" class="char-btn" data-char="あやね">あやね</button>
+            <button type="button" class="char-btn" data-char="バイマン">バイマン</button>
+            <button type="button" class="char-btn" data-char="バース">バース</button>
+            <button type="button" class="char-btn" data-char="ティナ">ティナ</button>
+            <button type="button" class="char-btn" data-char="ミラ">ミラ</button>
+            <button type="button" class="char-btn" data-char="クリスティ">クリスティ</button>
+            <button type="button" class="char-btn" data-char="こころ">こころ</button>
+            <button type="button" class="char-btn" data-char="ラ・マリポーサ">ラ・マリポーサ</button>
+            <button type="button" class="char-btn" data-char="ブラッド・ウォン">ブラッド・ウォン</button>
+            <button type="button" class="char-btn" data-char="エリオット">エリオット</button>
+            <button type="button" class="char-btn" data-char="雷道">雷道</button>
+            <button type="button" class="char-btn" data-char="不知火 舞">不知火 舞</button>
+            <button type="button" class="char-btn" data-char="クーラ・ダイアモンド">クーラ・ダイアモンド</button>
+        </div>
+
+        <!-- AND / OR 切り替えスイッチ -->
+        <div class="switch-container">
+            <span>結合条件:</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="searchModeSwitch">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
 
     <table id="dlcTable" class="display">
         <thead>
@@ -145,7 +351,7 @@
         <td data-order="2200" class="text-center price-cell">
             ¥ 2,200
         </td>
-        <td>
+        <td><span class="search-only">かすみ, KASUMI, マリー・ローズ, MARIE ROSE, NiCO, NiCO, ジャン･リー, JANN LEE, リュウ・ハヤブサ, HAYABUSA, バース, BASS, こころ, KOKORO, ハヤテ, HAYATE, レイファン, LEIFANG, ヒトミ, HITOMI, バイマン, BAYMAN, 女天狗, NYOTENGU, 雷道, RAIDOU</span>
             『DOA6LR』に登場するキャラクターに着せる、『ハッピーウェディングコスチュームVol.1』です。 13キャラクターに1着ずつ、合計13着のセットです。
         </td>
     </tr>
@@ -369,7 +575,7 @@
         <td data-order="3850" class="text-center price-cell">
             ¥ 3,850
         </td>
-        <td>
+        <td><span class="search-only">かすみ, KASUMI, マリー・ローズ, MARIE ROSE, ほのか, HONOKA, ティナ, TINA, エレナ, HELENA, こころ, KOKORO, レイファン, LEIFANG, あやね, AYANE, ラ・マリポーサ, LA MARIPOSA, クリスティ, CHRISTIE, ヒトミ, HITOMI, ミラ, MILA, 女天狗, NYOTENGU, フェーズ4, PHASE 4, 紅葉, MOMIJI, レイチェル, RACHEL</span>
             『ガスト』 コラボコスチューム 全16着のお得なセットです。
         </td>
     </tr>
@@ -383,7 +589,7 @@
         <td data-order="4620" class="text-center price-cell">
             ¥ 4,620
         </td>
-        <td>
+        <td><span class="search-only">かすみ, KASUMI, マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, ティナ, TINA, エレナ, HELENA, こころ, KOKORO, レイファン, LEIFANG, あやね, AYANE, ラ・マリポーサ, LA MARIPOSA, クリスティ, CHRISTIE, ヒトミ, HITOMI, ミラ, MILA, 女天狗, NYOTENGU, フェーズ4, PHASE 4, 紅葉, MOMIJI, レイチェル, RACHEL</span>
             『ライザのアトリエ』コラボコスチュームと『ガスト』コラボコスチュームがセットになったお得な商品です。
         </td>
     </tr>
@@ -425,7 +631,7 @@
         <td data-order="330" class="text-center price-cell">
             ¥ 330
         </td>
-        <td>
+        <td><span class="search-only">フェーズ4</span>
             『よるのないくに』に登場する「アーナス」の衣装をモチーフにした、フェーズ４用のコスチュームです。
         </td>
     </tr>
@@ -635,7 +841,7 @@
         <td data-order="2750" class="text-center price-cell">
             ¥ 2,750
         </td>
-        <td>
+        <td><span class="search-only">かすみ, KASUMI, マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, ティナ, TINA, エレナ, HELENA, こころ, KOKORO, レイファン, LEIFANG, あやね, AYANE, ラ・マリポーサ, LA MARIPOSA, クリスティ, CHRISTIE, ヒトミ, HITOMI, ミラ, MILA, 女天狗, NYOTENGU, フェーズ4, PHASE 4, 紅葉, MOMIJI</span>
             汗だく！トレーニングウェア全16着のお得なセットです。
         </td>
     </tr>
@@ -663,7 +869,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">フェーズ4</span>
             フェーズ４用の汗だく！トレーニングウェアです。
         </td>
     </tr>
@@ -901,7 +1107,7 @@
         <td data-order="1540" class="text-center price-cell">
             ¥ 1,540
         </td>
-        <td>
+        <td><span class="search-only">マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, バース, BASS, ミラ, MILA, フェーズ4, PHASE 4</span>
             デザインコンテスト2019コスチューム 全6着のお得なセットです。
         </td>
     </tr>
@@ -915,7 +1121,7 @@
         <td data-order="330" class="text-center price-cell">
             ¥ 330
         </td>
-        <td>
+        <td><span class="search-only">フェーズ4</span>
             フェーズ４用のデザインコンテスト2019コスチュームです。
         </td>
     </tr>
@@ -957,7 +1163,7 @@
         <td data-order="2750" class="text-center price-cell">
             ¥ 2,750
         </td>
-        <td>
+        <td><span class="search-only">かすみ, KASUMI, マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, ティナ, TINA, エレナ, HELENA, こころ, KOKORO, レイファン, LEIFANG, あやね, AYANE, ラ・マリポーサ, LA MARIPOSA, クリスティ, CHRISTIE, ヒトミ, HITOMI, ミラ, MILA, 女天狗, NYOTENGU, フェーズ4, PHASE 4, 紅葉, MOMIJI</span>
             ウィッチパーティー☆コスチューム全16着のお得なセットです。
         </td>
     </tr>
@@ -985,7 +1191,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">フェーズ4</span>
             フェーズ４用のウィッチパーティーコスチュームです。
         </td>
     </tr>
@@ -1195,7 +1401,7 @@
         <td data-order="2750" class="text-center price-cell">
             ¥ 2,750
         </td>
-        <td>
+        <td><span class="search-only">かすみ, KASUMI, マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, ティナ, TINA, エレナ, HELENA, こころ, KOKORO, レイファン, LEIFANG, あやね, AYANE, ラ・マリポーサ, LA MARIPOSA, クリスティ, CHRISTIE, ヒトミ, HITOMI, ミラ, MILA, 女天狗, NYOTENGU, フェーズ4, PHASE 4</span>
             潮風そよぐサマーワンピ全15着のお得なセットです。
         </td>
     </tr>
@@ -1251,7 +1457,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">フェーズ4</span>
             フェーズ４用の潮風そよぐサマーワンピです。
         </td>
     </tr>
@@ -1503,7 +1709,7 @@
         <td data-order="3850" class="text-center price-cell">
             ¥ 3,850
         </td>
-        <td>
+        <td><span class="search-only">マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, ザック, ZACK, ティナ, TINA, ジャン･リー, JANN LEE, リュウ・ハヤブサ, HAYABUSA, エレナ, HELENA, バース, BASS, こころ, KOKORO, ハヤテ, HAYATE, レイファン, LEIFANG, あやね, AYANE, エリオット, ELIOT, ラ・マリポーサ, LA MARIPOSA, ブラッド・ウォン, BRAD WONG, クリスティ, CHRISTIE, ヒトミ, HITOMI, バイマン, BAYMAN, リグ, RIG, ミラ, MILA, 雷道, RAIDOU, ディエゴ, DIEGO, フェーズ4, PHASE 4</span>
             『DOA6LR』に登場するキャラクターに着せる、「デラックスコスチューム」です。25キャラクターに1着ずつ、合計25着が追加されます。
         </td>
     </tr>
@@ -1615,7 +1821,7 @@
         <td data-order="2200" class="text-center price-cell">
             ¥ 2,200
         </td>
-        <td>
+        <td><span class="search-only">ほのか, HONOKA, NiCO, NiCO, ティナ, TINA, エレナ, HELENA, こころ, KOKORO, レイファン, LEIFANG, あやね, AYANE, ラ・マリポーサ, LA MARIPOSA, クリスティ, CHRISTIE, ヒトミ, HITOMI, ミラ, MILA, 女天狗, NYOTENGU, フェーズ4, PHASE 4, 紅葉, MOMIJI</span>
             過去作で人気のコスチュームが復刻！ うさぴょんコスチューム全16着のお得なセットです。
         </td>
     </tr>
@@ -1629,7 +1835,7 @@
         <td data-order="990" class="text-center price-cell">
             ¥ 990
         </td>
-        <td>
+        <td><span class="search-only">マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO</span>
             『ライザのアトリエ』 コラボコスチューム 全3着のお得なセットです。
         </td>
     </tr>
@@ -1690,7 +1896,7 @@
         </td>
     </tr>
     <tr>
-        <td data-search="&quot;Nova&quot; Sci-Fi Body Suit Set" class="text-center">
+        <td asfsfsafsdafsda="&quot;Nova&quot; Sci-Fi Body Suit Set" class="text-center">
             <div class="dlc-name">&quot;Nova&quot; Sci-Fi Body Suit Set</div>
             <a href="https://store.steampowered.com/app/4495810/Nova_SciFi_Body_Suit_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
                 <img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4495810/312982b4d0e624409f461dfb3982451643a4159f/header_292x136.jpg?t=1782350074" alt="&quot;Nova&quot; Sci-Fi Body Suit Set" class="dlc-banner" loading="lazy">
@@ -1699,7 +1905,7 @@
         <td data-order="4950" class="text-center price-cell">
             ¥ 4,950
         </td>
-        <td>
+        <td><span class="search-only">かすみ, KASUMI, マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, ザック, ZACK, ティナ, TINA, エレナ, HELENA, こころ, KOKORO, レイファン, LEIFANG, あやね, AYANE, ラ・マリポーサ, LA MARIPOSA, クリスティ, CHRISTIE, ヒトミ, HITOMI, ミラ, MILA, 女天狗, NYOTENGU, フェーズ4, PHASE 4, 紅葉, MOMIJI, レイチェル, RACHEL</span>
             光る！SFボディスーツ 全20着のお得なセットです。
         </td>
     </tr>
@@ -1811,7 +2017,7 @@
         <td data-order="330" class="text-center price-cell">
             ¥ 330
         </td>
-        <td>
+        <td><span class="search-only">フェーズ4</span>
             フェーズ４用の光る！SFボディスーツです。
         </td>
     </tr>
@@ -2007,7 +2213,7 @@
         <td data-order="3520" class="text-center price-cell">
             ¥ 3,520
         </td>
-        <td>
+        <td><span class="search-only">かすみ, KASUMI, マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, ザック, ZACK, ティナ, TINA, ジャン･リー, JANN LEE, リュウ・ハヤブサ, HAYABUSA, エレナ, HELENA, バース, BASS, こころ, KOKORO, ハヤテ, HAYATE, レイファン, LEIFANG, あやね, AYANE, エリオット, ELIOT, ラ・マリポーサ, LA MARIPOSA, ブラッド・ウォン, BRAD WONG, クリスティ, CHRISTIE, ヒトミ, HITOMI, バイマン, BAYMAN, リグ, RIG, ミラ, MILA, 女天狗, NYOTENGU, 雷道, RAIDOU, ディエゴ, DIEGO, フェーズ4, PHASE 4</span>
             楽園の水着コスチューム全26着のお得なセットです。
         </td>
     </tr>
@@ -2105,7 +2311,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">フェーズ4</span>
             フェーズ４用の楽園の水着コスチュームです。
         </td>
     </tr>
@@ -2469,7 +2675,7 @@
         <td data-order="2750" class="text-center price-cell">
             ¥ 2,750
         </td>
-        <td>
+        <td><span class="search-only">かすみ, KASUMI, マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, ティナ, TINA, エレナ, HELENA, こころ, KOKORO, レイファン, LEIFANG, あやね, AYANE, ラ・マリポーサ, LA MARIPOSA, クリスティ, CHRISTIE, ヒトミ, HITOMI, ミラ, MILA, 女天狗, NYOTENGU, フェーズ4, PHASE 4, 紅葉, MOMIJI</span>
             サンタさんビキニ 全16着のお得なセットです。
         </td>
     </tr>
@@ -2567,7 +2773,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">フェーズ4</span>
             フェーズ４用のサンタさんビキニです。
         </td>
     </tr>
@@ -2749,7 +2955,7 @@
         <td data-order="2640" class="text-center price-cell">
             ¥ 2,640
         </td>
-        <td>
+        <td><span class="search-only">かすみ, KASUMI, マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, ティナ, TINA, エレナ, HELENA, こころ, KOKORO, レイファン, LEIFANG, あやね, AYANE, ラ・マリポーサ, LA MARIPOSA, クリスティ, CHRISTIE, ヒトミ, HITOMI, ミラ, MILA, 女天狗, NYOTENGU, フェーズ4, PHASE 4, 紅葉, MOMIJI, レイチェル, RACHEL, たまき, TAMAKI</span>
             過去作で人気のコスチュームが復刻！ スクールコスチューム 全18着のお得なセットです。
         </td>
     </tr>
@@ -2861,7 +3067,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">フェーズ4</span>
             過去作で人気のコスチュームが復刻！ フェーズ４用のスクールコスチュームです。
         </td>
     </tr>
@@ -2945,7 +3151,7 @@
         <td data-order="2200" class="text-center price-cell">
             ¥ 2,200
         </td>
-        <td>
+        <td><span class="search-only">NiCO, NiCO, ジャン･リー, JANN LEE, リュウ・ハヤブサ, HAYABUSA, エレナ, HELENA, こころ, KOKORO, レイファン, LEIFANG, エリオット, ELIOT, ブラッド・ウォン, BRAD WONG, バイマン, BAYMAN, 雷道, RAIDOU, フェーズ4, PHASE 4</span>
             『DOA6LR』に登場するキャラクターに着せる、『七つの海のパイレーツコスチュームVol.2』です。 13キャラクターに1着ずつ、合計13着のセットです。
         </td>
     </tr>
@@ -2959,7 +3165,7 @@
         <td data-order="2200" class="text-center price-cell">
             ¥ 2,200
         </td>
-        <td>
+        <td><span class="search-only">ほのか, HONOKA, ザック, ZACK, ティナ, TINA, バース, BASS, ハヤテ, HAYATE, あやね, AYANE, ラ・マリポーサ, LA MARIPOSA, クリスティ, CHRISTIE, ヒトミ, HITOMI, リグ, RIG, ミラ, MILA, 女天狗, NYOTENGU, ディエゴ, DIEGO</span>
             『DOA6LR』に登場するキャラクターに着せる、『七つの海のパイレーツコスチュームVol.1』です。 13キャラクターに1着ずつ、合計13着のセットです。
         </td>
     </tr>
@@ -2987,7 +3193,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">フェーズ4</span>
             「フェーズ４」用の七つの海のパイレーツコスチュームです。
         </td>
     </tr>
@@ -3379,7 +3585,7 @@
         <td data-order="2640" class="text-center price-cell">
             ¥ 2,640
         </td>
-        <td>
+        <td><span class="search-only">かすみ, KASUMI, マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, ザック, ZACK, ティナ, TINA, ジャン･リー, JANN LEE, リュウ・ハヤブサ, HAYABUSA, エレナ, HELENA, バース, BASS, こころ, KOKORO, ハヤテ, HAYATE, レイファン, LEIFANG, あやね, AYANE, エリオット, ELIOT, ラ・マリポーサ, LA MARIPOSA, ブラッド・ウォン, BRAD WONG, クリスティ, CHRISTIE, ヒトミ, HITOMI, バイマン, BAYMAN, リグ, RIG, ミラ, MILA, 女天狗, NYOTENGU, 雷道, RAIDOU, ディエゴ, DIEGO, フェーズ4, PHASE 4</span>
             変身！NINJAコスチューム全26着のお得なセットです。 バトル中の操作や特定の条件を満たすことでデザインが変化します。
         </td>
     </tr>
@@ -3519,7 +3725,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">フェーズ4</span>
             フェーズ４用の変身！NINJAコスチュームです。 バトル中の操作や特定の条件を満たすことでデザインが変化します。
         </td>
     </tr>
@@ -3743,7 +3949,7 @@
         <td data-order="2640" class="text-center price-cell">
             ¥ 2,640
         </td>
-        <td>
+        <td><span class="search-only">かすみ, KASUMI, マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, ザック, ZACK, ティナ, TINA, ジャン･リー, JANN LEE, リュウ・ハヤブサ, HAYABUSA, エレナ, HELENA, バース, BASS, こころ, KOKORO, ハヤテ, HAYATE, レイファン, LEIFANG, あやね, AYANE, エリオット, ELIOT, ラ・マリポーサ, LA MARIPOSA, ブラッド・ウォン, BRAD WONG, クリスティ, CHRISTIE, ヒトミ, HITOMI, バイマン, BAYMAN, リグ, RIG, ミラ, MILA, 女天狗, NYOTENGU, 雷道, RAIDOU, ディエゴ, DIEGO, フェーズ4, PHASE 4, 紅葉, MOMIJI</span>
             過去作で人気のコスチュームが復刻！ サンタコスチューム全28着のお得なセットです。
         </td>
     </tr>
@@ -4051,7 +4257,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">フェーズ4</span>
             「フェーズ４」用のデラックスコスチュームです。
         </td>
     </tr>
@@ -4275,7 +4481,7 @@
         <td data-order="2200" class="text-center price-cell">
             ¥ 2,200
         </td>
-        <td>
+        <td><span class="search-only">ほのか, HONOKA, ザック, ZACK, ティナ, TINA, エレナ, HELENA, あやね, AYANE, エリオット, ELIOT, ラ・マリポーサ, LA MARIPOSA, ブラッド・ウォン, BRAD WONG, クリスティ, CHRISTIE, リグ, RIG, ミラ, MILA, ディエゴ, DIEGO, フェーズ4, PHASE 4</span>
             『DOA6LR』に登場するキャラクターに着せる、『ハッピーウェディングコスチュームVol.2』です。 13キャラクターに1着ずつ、合計13着のセットです。
         </td>
     </tr>
@@ -4541,7 +4747,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">フェーズ4</span>
             過去作で人気のコスチュームが復刻！ フェーズ４用のサンタコスチュームです。
         </td>
     </tr>
@@ -4835,7 +5041,7 @@
         <td data-order="2420" class="text-center price-cell">
             ¥ 2,420
         </td>
-        <td>
+        <td><span class="search-only">かすみ, KASUMI, マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, ティナ, TINA, エレナ, HELENA, こころ, KOKORO, レイファン, LEIFANG, あやね, AYANE, ラ・マリポーサ, LA MARIPOSA, クリスティ, CHRISTIE, ヒトミ, HITOMI, ミラ, MILA, 女天狗, NYOTENGU, フェーズ4, PHASE 4, 紅葉, MOMIJI, レイチェル, RACHEL</span>
             過去作で人気のコスチュームが復刻！ 天使すぎるメイドコスチューム 全17着のお得なセットです。
         </td>
     </tr>
@@ -4905,7 +5111,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">フェーズ4</span>
             過去作で人気のコスチュームが復刻！ フェーズ４用の天使すぎるメイドコスチュームです。
         </td>
     </tr>
@@ -5115,7 +5321,7 @@
         <td data-order="2200" class="text-center price-cell">
             ¥ 2,200
         </td>
-        <td>
+        <td><span class="search-only">かすみ, KASUMI, マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, ティナ, TINA, エレナ, HELENA, こころ, KOKORO, レイファン, LEIFANG, あやね, AYANE, ラ・マリポーサ, LA MARIPOSA, クリスティ, CHRISTIE, ヒトミ, HITOMI, ミラ, MILA, 女天狗, NYOTENGU, フェーズ4, PHASE 4, 紅葉, MOMIJI</span>
             過去作で人気のコスチュームが復刻！ ラブリーサマーコスチューム全16着のお得なセットです。
         </td>
     </tr>
@@ -5129,7 +5335,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">フェーズ4</span>
             過去作で人気のコスチュームが復刻！ フェーズ４用のラブリーサマーコスチュームです。
         </td>
     </tr>
@@ -5339,7 +5545,7 @@
         <td data-order="2640" class="text-center price-cell">
             ¥ 2,640
         </td>
-        <td>
+        <td><span class="search-only">かすみ, KASUMI, マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, ティナ, TINA, エレナ, HELENA, こころ, KOKORO, レイファン, LEIFANG, あやね, AYANE, ラ・マリポーサ, LA MARIPOSA, クリスティ, CHRISTIE, ヒトミ, HITOMI, ミラ, MILA, 女天狗, NYOTENGU, フェーズ4, PHASE 4, 紅葉, MOMIJI, レイチェル, RACHEL, たまき, TAMAKI</span>
             過去作で人気のコスチュームが復刻！ お嬢様の休日コスチューム 全18着のお得なセットです。
         </td>
     </tr>
@@ -5395,7 +5601,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">フェーズ4</span>
             過去作で人気のコスチュームが復刻！ フェーズ４用のお嬢様の休日コスチュームです。
         </td>
     </tr>
@@ -5605,7 +5811,7 @@
         <td data-order="2420" class="text-center price-cell">
             ¥ 2,420
         </td>
-        <td>
+        <td><span class="search-only">かすみ, KASUMI, マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, ティナ, TINA, エレナ, HELENA, こころ, KOKORO, レイファン, LEIFANG, あやね, AYANE, ラ・マリポーサ, LA MARIPOSA, クリスティ, CHRISTIE, ヒトミ, HITOMI, ミラ, MILA, 女天狗, NYOTENGU, フェーズ4, PHASE 4, 紅葉, MOMIJI, レイチェル, RACHEL</span>
             過去作で人気のコスチュームが復刻！ セクシーチャイナドレス全17着のお得なセットです。
         </td>
     </tr>
@@ -5647,7 +5853,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">フェーズ4</span>
             過去作で人気のコスチュームが復刻！ フェーズ４用のセクシーチャイナドレスです。
         </td>
     </tr>
@@ -6304,8 +6510,8 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script>
     $(document).ready(function() {
-        $('#dlcTable').DataTable({
-            "order": [[1, "desc"]], // ★この行を追加（1列目[価格]を降順[desc]にする）
+        var table = $('#dlcTable').DataTable({
+            "order": [[1, "desc"]], // 1列目[価格]を降順[desc]にする
             "pageLength": 25,
             "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "すべて表示"]],
             "language": {
@@ -6313,7 +6519,123 @@
             },
             "columnDefs": [
                 { "orderable": true, "targets": [0, 1, 2] }
-            ]
+            ],
+            // 検索ボックス生成後に、標準の検索ハンドラを独自ロジックへ差し替える
+            // （language.urlの非同期ロード後に発火するため、ここで処理するのが安全）
+            "initComplete": function() {
+                var $input = $('#dlcTable_filter input');
+
+                // DataTables標準の検索イベントを解除し、独自ハンドラを登録
+                // （search.* はtype="search"の「×」クリア操作も拾うため含める）
+                $input.off('keyup.DT search.DT input.DT paste.DT cut.DT')
+                      .on('input.custom search.custom', function() {
+                          // 手入力時はボタン選択を解除（入力源を一本化）
+                          $('.char-btn.active').removeClass('active');
+                          var raw = this.value;
+                          var terms = raw.split(/\s+/).filter(function(t) {
+                              return t.length > 0;
+                          });
+                          // 表示は生の入力テキストのまま、実検索はAND/ORの正規表現
+                          runSearch(terms, raw);
+                      });
+            }
+        });
+
+        // 検索ボックスに見せる「読みやすい文字列」。未使用時はnull。
+        var displayLabel = null;
+
+        // 現在アクティブなボタンのキャラクター名を配列で返す
+        function getActiveChars() {
+            var chars = [];
+            $('.char-btn.active').each(function() {
+                chars.push($(this).data('char'));
+            });
+            return chars;
+        }
+
+        // 用語配列とAND/ORスイッチから正規表現を組み立てて検索を実行する共通関数
+        //   terms       : 検索語の配列
+        //   displayText : 検索ボックスに見せる文字列
+        function runSearch(terms, displayText) {
+            // 検索語が無ければクリア
+            if (terms.length === 0) {
+                displayLabel = null;
+                table.search('').draw();
+                return;
+            }
+
+            var isAndMode = $('#searchModeSwitch').is(':checked');
+
+            // 正規表現の特殊文字をエスケープ（DataTables組み込みユーティリティ）
+            var escaped = terms.map(function(t) {
+                return $.fn.dataTable.util.escapeRegex(t);
+            });
+
+            var regexString;
+            if (isAndMode) {
+                // 【AND検索】先読み(Lookahead) 例: (?=.*かすみ)(?=.*紅葉)
+                regexString = escaped.map(function(t) {
+                    return '(?=.*' + t + ')';
+                }).join('');
+            } else {
+                // 【OR検索】パイプ「|」で結合 例: (かすみ|紅葉)
+                regexString = '(' + escaped.join('|') + ')';
+            }
+
+            displayLabel = displayText;
+
+            // 実検索は正規表現で実行 (第2引数true=正規表現, 第3引数false=スマート検索OFF)
+            table.search(regexString, true, false).draw();
+        }
+
+        // 現在の入力源（ボタン優先、無ければ検索ボックスの手入力）で再検索する
+        function applyCurrentSearch() {
+            var chars = getActiveChars();
+            if (chars.length > 0) {
+                runSearch(chars, chars.join(' '));
+            } else {
+                var raw = $('#dlcTable_filter input').val() || '';
+                var terms = raw.split(/\s+/).filter(function(t) {
+                    return t.length > 0;
+                });
+                runSearch(terms, raw);
+            }
+        }
+
+        // 描画のたびに、検索中なら検索ボックスの表示を読みやすい文字列へ戻す
+        // （DataTablesが描画時に正規表現文字列を書き戻すため、それを上書きする）
+        table.on('draw', function() {
+            if (displayLabel === null) return;
+            var $input = $('#dlcTable_filter input');
+            if ($input.val() !== displayLabel) {
+                $input.val(displayLabel);
+            }
+        });
+
+        // キャラクターボタン：トグルして検索（表示は半角スペース区切りのキャラ名）
+        $('.char-btn').on('click', function() {
+            $(this).toggleClass('active');
+            var chars = getActiveChars();
+            runSearch(chars, chars.join(' '));
+        });
+
+        // AND/OR スイッチ：現在の入力源に対して再検索（手入力にも効く）
+        $('#searchModeSwitch').on('change', function() {
+            applyCurrentSearch();
+        });
+
+        // キャラクターフィルターの開閉ロジック
+        $('#toggleFilterBtn').on('click', function() {
+            var $container = $('.filter-container');
+            var $btn = $(this);
+
+            $container.slideToggle(300, function() {
+                if ($container.is(':visible')) {
+                    $btn.text('キャラクターフィルターを閉じる ▴').addClass('active');
+                } else {
+                    $btn.text('キャラクターフィルターを表示する ▾').removeClass('active');
+                }
+            });
         });
     });
 </script>
