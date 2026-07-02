@@ -3,7 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEAD OR ALIVE 6 Last Round - DLC List</title>
+    <title>DEAD OR ALIVE 6 Last Round - DLC List (Unofficial)</title>
+
+    <!-- favicon -->
+    <link rel="icon" type="image/png" href="./favicon/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/svg+xml" href="./favicon/favicon.svg">
+    <link rel="icon" href="./favicon/favicon.ico" sizes="any">
+    <link rel="apple-touch-icon" href="./favicon/apple-touch-icon.png">
+    <link rel="manifest" href="./favicon/site.webmanifest">
+    <meta name="theme-color" content="#1f4e78">
+
+    <meta name="description" content="DEAD OR ALIVE 6 Last Round の400種類を超えるDLCを検索し一覧表示する非公式ページです。">
+    <meta name="robots" content="nofollow">
+    <!-- OGP -->
+    <meta property="og:locale" content="ja_JP">
+    <meta property="og:site_name" content="DEAD OR ALIVE 6 Last Round - DLC List (Unofficial)">
+    <meta property="og:title" content="DEAD OR ALIVE 6 Last Round - DLC List (Unofficial)">
+    <meta property="og:description" content="DEAD OR ALIVE 6 Last Round の400種類を超えるDLCを検索し一覧表示する非公式ページです。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kiyopon46.github.io/articles/useful/doa6lr-dlc-list.html">
+    <meta property="og:image" content="https://kiyopon46.github.io/articles/useful/doa6lr-dlc-ogp.jpg">
+    <meta property="og:image:width" content="1280">
+    <meta property="og:image:height" content="720">
+    <meta property="og:image:alt" content="DEAD OR ALIVE 6 Last Round DLC List">
+    <!-- X(Twitter)カード -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="DEAD OR ALIVE 6 Last Round - DLC List (Unofficial)">
+    <meta name="twitter:description" content="DEAD OR ALIVE 6 Last Round の400種類を超えるDLCを検索し一覧表示する非公式ページです。">
+    <meta name="twitter:image" content="https://kiyopon46.github.io/articles/useful/doa6lr-dlc-ogp.jpg">
+
+    <link rel="canonical" href="https://kiyopon46.github.io/articles/useful/doa6lr-dlc-list.html">
     <!-- DataTables CSS via CDN -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <style>
@@ -320,22 +349,6 @@
             height: 20px;
             accent-color: #1f4e78;
             cursor: pointer;
-        }
-        /* 購入済みの行をグレーアウト（行内のチェック状態を :has() で判定） */
-        #dlcTable tbody tr:has(.purchased-check:checked) {
-            background-color: #f0f0f0;
-            color: #adb5bd;
-        }
-        #dlcTable tbody tr:has(.purchased-check:checked) .dlc-name {
-            color: #adb5bd;
-        }
-        #dlcTable tbody tr:has(.purchased-check:checked) a {
-            color: #adb5bd;
-        }
-        /* バナー画像も淡くして「購入済み感」を出す */
-        #dlcTable tbody tr:has(.purchased-check:checked) .dlc-banner {
-            filter: grayscale(1);
-            opacity: 0.5;
         }
         /* 購入済みの行をグレーアウト（行内のチェック状態を :has() で判定） */
         #dlcTable tbody tr:has(.purchased-check:checked) {
