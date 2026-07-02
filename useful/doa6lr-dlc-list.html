@@ -353,6 +353,51 @@
             filter: grayscale(1);
             opacity: 0.5;
         }
+    
+        /* フィルターのグループ分け（キャラクター / キーワードで背景色を分ける） */
+        .filter-group {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .filter-group-label {
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+        }
+        /* キャラクターグループ：ネイビー系の淡い背景 */
+        .filter-group-char {
+            background: #eef2f7;
+            border: 1px solid #d6e0ec;
+        }
+        .filter-group-char .filter-group-label {
+            color: #1f4e78;
+        }
+        /* キーワードグループ：ティール系の淡い背景で区別 */
+        .filter-group-keyword {
+            background: #e8f5f1;
+            border: 1px solid #cce9e1;
+        }
+        .filter-group-keyword .filter-group-label {
+            color: #0f766e;
+        }
+        /* キーワードボタン：ティール系の配色（.char-btn を上書き） */
+        .char-btn.keyword-btn {
+            color: #0f766e;
+            border-color: #0f766e;
+        }
+        .char-btn.keyword-btn:hover {
+            background-color: #e3f4ef;
+        }
+        .char-btn.keyword-btn.active {
+            background-color: #0f766e;
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
@@ -368,8 +413,10 @@
     </div>
 
     <div class="filter-container" style="display: none;">
-        <!-- キャラクター選択ボタン（複数選択可能） -->
-        <div class="char-buttons">
+        <!-- キャラクターグループ -->
+        <div class="filter-group filter-group-char">
+            <span class="filter-group-label">キャラクター</span>
+            <div class="char-buttons">
             <button type="button" class="char-btn" data-char="かすみ">かすみ</button>
             <button type="button" class="char-btn" data-char="マリー・ローズ">マリー・ローズ</button>
             <button type="button" class="char-btn" data-char="ほのか">ほのか</button>
@@ -401,6 +448,22 @@
             <button type="button" class="char-btn" data-char="雷道">雷道</button>
             <button type="button" class="char-btn" data-char="不知火 舞">不知火 舞</button>
             <button type="button" class="char-btn" data-char="クーラ・ダイアモンド">クーラ・ダイアモンド</button>
+            </div>
+        </div>
+
+        <!-- キーワードグループ -->
+        <div class="filter-group filter-group-keyword">
+            <span class="filter-group-label">キーワード</span>
+            <div class="char-buttons">
+                <button type="button" class="char-btn keyword-btn" data-char="水着">水着</button>
+                <button type="button" class="char-btn keyword-btn" data-char="ビキニ">ビキニ</button>
+                <button type="button" class="char-btn keyword-btn" data-char="ウェディング">ウェディング</button>
+                <button type="button" class="char-btn keyword-btn" data-char="チャイナ">チャイナ</button>
+                <button type="button" class="char-btn keyword-btn" data-char="メイド">メイド</button>
+                <button type="button" class="char-btn keyword-btn" data-char="サンタ">サンタ</button>
+                <button type="button" class="char-btn keyword-btn" data-char="スクール">スクール</button>
+                <button type="button" class="char-btn keyword-btn" data-char="ドレス">ドレス</button>
+            </div>
         </div>
 
         <!-- AND / OR 切り替えスイッチ -->
@@ -7184,6 +7247,17 @@
                     var chk = this.querySelector('.purchased-check');
                     if (chk) chk.checked = purchasedSet.has(id);
                 });
+            },
+            // 初期化完了後、検索ボックスを自前で制御する（空白区切りAND/OR検索）
+            "initComplete": function() {
+                var $input = $('#dlcTable_filter input');
+                // DataTables既定の検索ハンドラ(.DT名前空間)を解除して独自処理に置き換える
+                $input.off('.DT');
+                $input.on('input', function() {
+                    // 手入力時はボタン選択を解除（検索の起点を入力欄に切り替える）
+                    $('.char-btn.active').removeClass('active');
+                    applyFilterFromText(this.value);
+                });
             }
         });
 
@@ -7215,72 +7289,77 @@
             }
         });
 
-        // ===== 既存：キャラクター検索（表示は読みやすく／実検索は正規表現） =====
+        // ===== キャラクター検索（表示は読みやすく／実検索は正規表現） =====
+        // 検索ボックスに「見せる」文字列。実検索は正規表現で行うため、描画後にこの文字列へ戻す。
         var displayLabel = null;
 
-        function applyFilter() {
-            var selectedChars = [];
-            $('.char-btn.active').each(function() {
-                selectedChars.push($(this).data('char'));
+        // 現在のスイッチ状態(AND/OR)に応じて、検索語の配列から正規表現を組み立てる
+        function buildRegex(terms) {
+            var escaped = terms.map(function(t) {
+                return $.fn.dataTable.util.escapeRegex(t); // 正規表現の特殊文字をエスケープ
             });
+            if ($('#searchModeSwitch').is(':checked')) {
+                // 【AND】各語を先読み(Lookahead)で連結：すべて含む行にマッチ
+                return escaped.map(function(t) { return '(?=.*' + t + ')'; }).join('');
+            }
+            // 【OR】パイプで連結：いずれかを含む行にマッチ
+            return '(' + escaped.join('|') + ')';
+        }
 
-            // 何も選択されていない場合は検索をクリア
-            if (selectedChars.length === 0) {
+        // 検索語の配列を実検索へ反映（label は検索ボックスに見せる文字列）
+        function runSearch(terms, label) {
+            if (terms.length === 0) {
                 displayLabel = null;
                 table.search('').draw();
                 return;
             }
-
-            // スイッチの状態を取得 (false = OR, true = AND)
-            var isAndMode = $('#searchModeSwitch').is(':checked');
-
-            // 正規表現の特殊文字をエスケープ（DataTables組み込みユーティリティ）
-            var escaped = selectedChars.map(function(c) {
-                return $.fn.dataTable.util.escapeRegex(c);
-            });
-
-            var regexString;
-            if (isAndMode) {
-                // 【AND検索】先読み(Lookahead)
-                regexString = escaped.map(function(c) {
-                    return '(?=.*' + c + ')';
-                }).join('');
-            } else {
-                // 【OR検索】パイプ「|」で結合
-                regexString = '(' + escaped.join('|') + ')';
-            }
-
-            // 検索ボックスに見せるのは半角スペース区切りのキャラクター名
-            displayLabel = selectedChars.join(' ');
-
-            // 実検索は正規表現で実行 (第2引数true=正規表現, 第3引数false=スマート検索OFF)
-            table.search(regexString, true, false).draw();
+            displayLabel = label;
+            // 第2引数true=正規表現, 第3引数false=スマート検索OFF
+            table.search(buildRegex(terms), true, false).draw();
         }
 
-        // 描画のたびに、ボタン検索中なら検索ボックスの表示を読みやすい文字列へ戻す
+        // ボタン由来：アクティブなキャラ名で検索
+        // （「不知火 舞」のように名前自体に空白を含む場合があるため、分割せず1語として扱う）
+        function applyFilterFromButtons() {
+            var terms = [];
+            $('.char-btn.active').each(function() {
+                terms.push(String($(this).data('char')));
+            });
+            runSearch(terms, terms.join(' '));
+            }
+
+        // 手入力由来：検索ボックスの文字列を空白で区切って検索
+        function applyFilterFromText(text) {
+            var terms = text.split(/\s+/).filter(function(t) { return t.length > 0; });
+            runSearch(terms, terms.join(' '));
+        }
+
+        // 描画後、検索ボックスの表示を読みやすい文字列へ戻す。
+        // DataTablesは描画時に正規表現をボックスへ書き戻すため、それを上書きする。
+        // ただし入力中(=フォーカス時)はカーソルを乱さないよう触らない。
         table.on('draw', function() {
             if (displayLabel === null) return;
             var $input = $('#dlcTable_filter input');
+            if ($input.length === 0 || $input[0] === document.activeElement) return;
             if ($input.val() !== displayLabel) {
                 $input.val(displayLabel);
             }
         });
 
-        // ユーザーが検索ボックスを直接編集したら、ボタン検索状態を解除する（委譲方式）
-        $(document).on('input', '#dlcTable_filter input', function() {
-            displayLabel = null;
-            $('.char-btn.active').removeClass('active');
-        });
-
-        // キャラクターボタンのクリックイベント（複数選択トグル）
+        // キャラクターボタンのクリック（複数選択トグル）
         $('.char-btn').on('click', function() {
             $(this).toggleClass('active');
-            applyFilter();
+            applyFilterFromButtons();
         });
 
-        // AND/OR スイッチの切り替えイベント
+        // AND/OR スイッチの切り替え：現在の検索対象で再検索
+        // （ボタンが選択されていればボタン優先、なければ入力欄の文字列を使う）
         $('#searchModeSwitch').on('change', function() {
-            applyFilter();
+            if ($('.char-btn.active').length > 0) {
+                applyFilterFromButtons();
+            } else {
+                applyFilterFromText($('#dlcTable_filter input').val());
+            }
         });
 
         // キャラクターフィルターの開閉ロジック
