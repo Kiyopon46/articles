@@ -411,6 +411,34 @@
             background-color: #0f766e;
             color: #ffffff;
         }
+
+        /* スイッチ行：結合条件とセット除外を横に並べる（狭い画面では折り返す） */
+        .switch-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px 28px;
+        }
+
+        /* セット除外トグル：ON/OFF 表記。
+           .slider は AND/OR 用に content が固定されているため、
+           専用クラスで詳細度を上げて上書きする（このブロックは .slider の定義より後に置くこと）。 */
+        .slider.slider-onoff {
+            background-color: #adb5bd; /* OFF側の色（グレー） */
+        }
+        .slider.slider-onoff:before {
+            content: "OFF";
+            color: #6c757d;
+        }
+        input:checked + .slider.slider-onoff {
+            background-color: #0f766e; /* ON側の色（ティール：キーワード群と同系） */
+        }
+        input:checked + .slider.slider-onoff:before {
+            transform: translateX(22px);
+            content: "ON";
+            color: #0f766e;
+        }
     </style>
 </head>
 <body>
@@ -469,7 +497,6 @@
             <span class="filter-group-label">キーワード</span>
             <div class="char-buttons">
                 <button type="button" class="char-btn keyword-btn" data-char="水着">水着</button>
-                <button type="button" class="char-btn keyword-btn" data-char="ビキニ">ビキニ</button>
                 <button type="button" class="char-btn keyword-btn" data-char="ウェディング">ウェディング</button>
                 <button type="button" class="char-btn keyword-btn" data-char="チャイナ">チャイナ</button>
                 <button type="button" class="char-btn keyword-btn" data-char="メイド">メイド</button>
@@ -481,13 +508,25 @@
             </div>
         </div>
 
-        <!-- AND / OR 切り替えスイッチ -->
-        <div class="switch-container">
-            <span>結合条件:</span>
-            <label class="toggle-switch">
-                <input type="checkbox" id="searchModeSwitch" checked>
-                <span class="slider"></span>
-            </label>
+        <!-- スイッチ行：AND/OR 切り替え と セット除外 -->
+        <div class="switch-row">
+            <!-- AND / OR 切り替えスイッチ -->
+            <div class="switch-container">
+                <span>結合条件:</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="searchModeSwitch" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <!-- セット除外スイッチ（ON にすると data-dlc-tags に set を持つ行を隠す） -->
+            <div class="switch-container">
+                <span>セット除く:</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="excludeSetSwitch" aria-label="セット商品を除外する">
+                    <span class="slider slider-onoff"></span>
+                </label>
+            </div>
         </div>
     </div>
 
@@ -509,7 +548,7 @@
         </thead>
         <tbody>
             
-    <tr data-dlc-id="4494960">
+    <tr data-dlc-id="4494960" data-dlc-tags="set">
         <td data-search="Happy Wedding Costume Vol.1 Set" class="text-center">
             <div class="dlc-name">Happy Wedding Costume Vol.1 Set</div>
             <a href="https://store.steampowered.com/app/4494960/Happy_Wedding_Costume_Vol1_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -749,7 +788,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4495130">
+    <tr data-dlc-id="4495130" data-dlc-tags="set">
         <td data-search="Gust Mashup Costume Set" class="text-center">
             <div class="dlc-name">Gust Mashup Costume Set</div>
             <a href="https://store.steampowered.com/app/4495130/Gust_Mashup_Costume_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -764,7 +803,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4495140">
+    <tr data-dlc-id="4495140" data-dlc-tags="set">
         <td data-search="Gust Mashup + Atelier Ryza Mashup Costumes" class="text-center">
             <div class="dlc-name">Gust Mashup + Atelier Ryza Mashup Costumes</div>
             <a href="https://store.steampowered.com/app/4495140/Gust_Mashup__Atelier_Ryza_Mashup_Costumes/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -1034,7 +1073,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4495320">
+    <tr data-dlc-id="4495320" data-dlc-tags="set">
         <td data-search="Energy Up! Training Wear Set" class="text-center">
             <div class="dlc-name">Energy Up! Training Wear Set</div>
             <a href="https://store.steampowered.com/app/4495320/Energy_Up_Training_Wear_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -1319,7 +1358,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4495560">
+    <tr data-dlc-id="4495560" data-dlc-tags="set">
         <td data-search="Design Contest 2019 Costume Set" class="text-center">
             <div class="dlc-name">Design Contest 2019 Costume Set</div>
             <a href="https://store.steampowered.com/app/4495560/Design_Contest_2019_Costume_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -1379,7 +1418,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4490190">
+    <tr data-dlc-id="4490190" data-dlc-tags="set">
         <td data-search="Witch Party Costume Set" class="text-center">
             <div class="dlc-name">Witch Party Costume Set</div>
             <a href="https://store.steampowered.com/app/4490190/Witch_Party_Costume_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -1634,7 +1673,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4490400">
+    <tr data-dlc-id="4490400" data-dlc-tags="set">
         <td data-search="Summer Breeze Collection Set" class="text-center">
             <div class="dlc-name">Summer Breeze Collection Set</div>
             <a href="https://store.steampowered.com/app/4490400/Summer_Breeze_Collection_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -1964,7 +2003,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4495640">
+    <tr data-dlc-id="4495640" data-dlc-tags="set">
         <td data-search="Deluxe Costume Set" class="text-center">
             <div class="dlc-name">Deluxe Costume Set</div>
             <a href="https://store.steampowered.com/app/4495640/Deluxe_Costume_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -2084,7 +2123,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4490600">
+    <tr data-dlc-id="4490600" data-dlc-tags="set">
         <td data-search="[Revival] Sexy Bunny Costume Set" class="text-center">
             <div class="dlc-name">[Revival] Sexy Bunny Costume Set</div>
             <a href="https://store.steampowered.com/app/4490600/Revival_Sexy_Bunny_Costume_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -2099,7 +2138,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4495770">
+    <tr data-dlc-id="4495770" data-dlc-tags="set">
         <td data-search="Atelier Ryza Mashup Set" class="text-center">
             <div class="dlc-name">Atelier Ryza Mashup Set</div>
             <a href="https://store.steampowered.com/app/4495770/Atelier_Ryza_Mashup_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -2174,7 +2213,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4495810">
+    <tr data-dlc-id="4495810" data-dlc-tags="set">
         <td asfsfsafsdafsda="&quot;Nova&quot; Sci-Fi Body Suit Set" class="text-center">
             <div class="dlc-name">&quot;Nova&quot; Sci-Fi Body Suit Set</div>
             <a href="https://store.steampowered.com/app/4495810/Nova_SciFi_Body_Suit_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -2504,7 +2543,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4490790">
+    <tr data-dlc-id="4490790" data-dlc-tags="set">
         <td data-search="Seaside Eden Costume Set" class="text-center">
             <div class="dlc-name">Seaside Eden Costume Set</div>
             <a href="https://store.steampowered.com/app/4490790/Seaside_Eden_Costume_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -2999,7 +3038,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4493550">
+    <tr data-dlc-id="4493550" data-dlc-tags="set">
         <td data-search="Santa Bikini Set" class="text-center">
             <div class="dlc-name">Santa Bikini Set</div>
             <a href="https://store.steampowered.com/app/4493550/Santa_Bikini_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -3009,7 +3048,7 @@
         <td data-order="2750" class="text-center price-cell">
             ¥ 2,750
         </td>
-        <td><span class="search-only">かすみ, KASUMI, マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, ティナ, TINA, エレナ, HELENA, こころ, KOKORO, レイファン, LEIFANG, あやね, AYANE, ラ・マリポーサ, LA MARIPOSA, クリスティ, CHRISTIE, ヒトミ, HITOMI, ミラ, MILA, 女天狗, NYOTENGU, フェーズ4, PHASE 4, 紅葉, MOMIJI</span>
+        <td><span class="search-only">水着, かすみ, KASUMI, マリー・ローズ, MARIE ROSE, ほのか, HONOKA, NiCO, NiCO, ティナ, TINA, エレナ, HELENA, こころ, KOKORO, レイファン, LEIFANG, あやね, AYANE, ラ・マリポーサ, LA MARIPOSA, クリスティ, CHRISTIE, ヒトミ, HITOMI, ミラ, MILA, 女天狗, NYOTENGU, フェーズ4, PHASE 4, 紅葉, MOMIJI</span>
             サンタさんビキニ 全16着のお得なセットです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
@@ -3024,7 +3063,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">水着</span>
             ティナ用のサンタさんビキニです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
@@ -3069,7 +3108,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">水着</span>
             レイチェル用のサンタさんビキニです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
@@ -3114,7 +3153,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td><span class="search-only">フェーズ4</span>
+        <td><span class="search-only">フェーズ4, 水着</span>
             フェーズ４用のサンタさんビキニです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
@@ -3144,7 +3183,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">水着</span>
             女天狗用のサンタさんビキニです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
@@ -3174,7 +3213,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">水着</span>
             NiCO用のサンタさんビキニです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
@@ -3234,7 +3273,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">水着</span>
             紅葉用のサンタさんビキニです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
@@ -3249,7 +3288,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">水着</span>
             ミラ用のサンタさんビキニです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
@@ -3279,7 +3318,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">水着</span>
             マリー・ローズ用のサンタさんビキニです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
@@ -3299,7 +3338,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4496050">
+    <tr data-dlc-id="4496050" data-dlc-tags="set">
         <td data-search="[Revival] School Uniform Set" class="text-center">
             <div class="dlc-name">[Revival] School Uniform Set</div>
             <a href="https://store.steampowered.com/app/4496050/Revival_School_Uniform_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -3324,7 +3363,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">水着</span>
             レイファン用のサンタさんビキニです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
@@ -3384,7 +3423,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">水着</span>
             こころ用のサンタさんビキニです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
@@ -3399,7 +3438,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">水着</span>
             かすみ用のサンタさんビキニです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
@@ -3429,7 +3468,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">水着</span>
             ほのか用のサンタさんビキニです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
@@ -3444,7 +3483,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">水着</span>
             ヒトミ用のサンタさんビキニです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
@@ -3459,7 +3498,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">水着</span>
             エレナ用のサンタさんビキニです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
@@ -3474,7 +3513,7 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">水着</span>
             クリスティ用のサンタさんビキニです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
@@ -3489,12 +3528,12 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">水着</span>
             あやね用のサンタさんビキニです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4493800">
+    <tr data-dlc-id="4493800" data-dlc-tags="set">
         <td data-search="Pirates of the 7 Seas Costumes Vol.2 Set" class="text-center">
             <div class="dlc-name">Pirates of the 7 Seas Costumes Vol.2 Set</div>
             <a href="https://store.steampowered.com/app/4493800/Pirates_of_the_7_Seas_Costumes_Vol2_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -3509,7 +3548,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4493810">
+    <tr data-dlc-id="4493810" data-dlc-tags="set">
         <td data-search="Pirates of the 7 Seas Costumes Vol.1 Set" class="text-center">
             <div class="dlc-name">Pirates of the 7 Seas Costumes Vol.1 Set</div>
             <a href="https://store.steampowered.com/app/4493810/Pirates_of_the_7_Seas_Costumes_Vol1_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -3959,7 +3998,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4494170">
+    <tr data-dlc-id="4494170" data-dlc-tags="set">
         <td data-search="Morphing Ninja Costume Set" class="text-center">
             <div class="dlc-name">Morphing Ninja Costume Set</div>
             <a href="https://store.steampowered.com/app/4494170/Morphing_Ninja_Costume_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -4349,7 +4388,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4496890">
+    <tr data-dlc-id="4496890" data-dlc-tags="set">
         <td data-search="[Revival] Santa&#x27;s Helper Costume Set" class="text-center">
             <div class="dlc-name">[Revival] Santa&#x27;s Helper Costume Set</div>
             <a href="https://store.steampowered.com/app/4496890/Revival_Santas_Helper_Costume_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -4619,7 +4658,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4490390">
+    <tr data-dlc-id="4490390" data-dlc-tags="set">
         <td data-search="Tamaki Debut Costume Set" class="text-center">
             <div class="dlc-name">Tamaki Debut Costume Set</div>
             <a href="https://store.steampowered.com/app/4490390/Tamaki_Debut_Costume_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -4664,7 +4703,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4493790">
+    <tr data-dlc-id="4493790" data-dlc-tags="set">
         <td data-search="Rachel Debut Costume Set" class="text-center">
             <div class="dlc-name">Rachel Debut Costume Set</div>
             <a href="https://store.steampowered.com/app/4493790/Rachel_Debut_Costume_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -4724,7 +4763,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4494510">
+    <tr data-dlc-id="4494510" data-dlc-tags="set">
         <td data-search="Momiji Debut Costume Set" class="text-center">
             <div class="dlc-name">Momiji Debut Costume Set</div>
             <a href="https://store.steampowered.com/app/4494510/Momiji_Debut_Costume_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -4919,7 +4958,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4494680">
+    <tr data-dlc-id="4494680" data-dlc-tags="set">
         <td data-search="Happy Wedding Costume Vol.2 Set" class="text-center">
             <div class="dlc-name">Happy Wedding Costume Vol.2 Set</div>
             <a href="https://store.steampowered.com/app/4494680/Happy_Wedding_Costume_Vol2_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -5519,7 +5558,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4497220">
+    <tr data-dlc-id="4497220" data-dlc-tags="set">
         <td data-search="[Revival] Maid Costume Set" class="text-center">
             <div class="dlc-name">[Revival] Maid Costume Set</div>
             <a href="https://store.steampowered.com/app/4497220/Revival_Maid_Costume_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -5819,7 +5858,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4497410">
+    <tr data-dlc-id="4497410" data-dlc-tags="set">
         <td data-search="[Revival] Hot Summer Costume Set" class="text-center">
             <div class="dlc-name">[Revival] Hot Summer Costume Set</div>
             <a href="https://store.steampowered.com/app/4497410/Revival_Hot_Summer_Costume_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -6059,7 +6098,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4497600">
+    <tr data-dlc-id="4497600" data-dlc-tags="set">
         <td data-search="[Revival] High Society Costume Set" class="text-center">
             <div class="dlc-name">[Revival] High Society Costume Set</div>
             <a href="https://store.steampowered.com/app/4497600/Revival_High_Society_Costume_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -6344,7 +6383,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4497800">
+    <tr data-dlc-id="4497800" data-dlc-tags="set">
         <td data-search="[Revival] Alluring Mandarin Dress Set" class="text-center">
             <div class="dlc-name">[Revival] Alluring Mandarin Dress Set</div>
             <a href="https://store.steampowered.com/app/4497800/Revival_Alluring_Mandarin_Dress_Set/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -6629,7 +6668,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4494590">
+    <tr data-dlc-id="4494590" data-dlc-tags="set">
         <td data-search="DOA6LR 「クーラ・ダイアモンド」使用権＋デビューコスチュームセット" class="text-center">
             <div class="dlc-name">DOA6LR 「クーラ・ダイアモンド」使用権＋デビューコスチュームセット</div>
             <a href="https://store.steampowered.com/app/4494590/DOA6LR/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -6659,7 +6698,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4494550">
+    <tr data-dlc-id="4494550" data-dlc-tags="set">
         <td data-search="DOA6LR 「不知火 舞」使用権＋デビューコスチュームセット" class="text-center">
             <div class="dlc-name">DOA6LR 「不知火 舞」使用権＋デビューコスチュームセット</div>
             <a href="https://store.steampowered.com/app/4494550/DOA6LR/?snr=1_16_16_18_curator-tabs&amp;amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -7104,12 +7143,12 @@
         <td data-order="220" class="text-center price-cell">
             ¥ 220
         </td>
-        <td>
+        <td><span class="search-only">水着</span>
             ラ・マリポーサ用のサンタさんビキニです。
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4781150">
+    <tr data-dlc-id="4781150" data-dlc-tags="set">
         <td data-search="DOA6LR マリー・ローズ 「ナイトオブローズ」セット" class="text-center">
             <div class="dlc-name">DOA6LR マリー・ローズ 「ナイトオブローズ」セット</div>
             <a href="https://store.steampowered.com/app/4781150/DOA6LR/?snr=1_16_16_18_curator-tabs&amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -7244,7 +7283,7 @@
         </td>
         <td class="text-center purchased-cell"><input type="checkbox" class="purchased-check" aria-label="購入済み"></td>
     </tr>
-    <tr data-dlc-id="4885810">
+    <tr data-dlc-id="4885810" data-dlc-tags="set">
         <td data-search="DOA6LR かすみ 「霞戦陣忍装束」セット" class="text-center">
             <div class="dlc-name">DOA6LR かすみ 「霞戦陣忍装束」セット</div>
             <a href="https://store.steampowered.com/app/4885810/DOA6LR/?snr=1_16_16_18_curator-tabs&amp;curator_clanid=45986294" target="_blank" rel="noopener noreferrer">
@@ -7261,7 +7300,7 @@
     </tr>
         </tbody>
     </table>
-    <div class="last-updated">Last Updated: 2026年7月9日</div>
+    <div class="last-updated">Last Updated: 2026年7月15日</div>
 </div>
 
 <!-- jQuery & DataTables JS via CDN -->
@@ -7273,6 +7312,7 @@
         // ===== 購入済み状態の永続化（localStorage） =====
         var STORAGE_KEY = 'doa6lr_purchased';       // 購入済みDLCのID配列を保存
         var FILTER_KEY  = 'doa6lr_show_purchased';  // 「購入済みも表示する」の状態を保存
+        var EXCLUDE_SET_KEY = 'doa6lr_exclude_set'; // 「セット除外」の状態を保存
 
         function loadPurchasedSet() {
             try {
@@ -7305,6 +7345,30 @@
             $showPurchased.prop('checked', localStorage.getItem(FILTER_KEY) === '1');
         } catch (e) { /* 失敗時はデフォルト（OFF）のまま */ }
 
+        // ===== 行タグ（data-dlc-tags）の読み込み =====
+        // 行の性質をHTML側に静的に持たせる仕組み。スペース区切りで複数指定できる。
+        //   例: <tr data-dlc-id="..." data-dlc-tags="set">
+        //   例: <tr data-dlc-id="..." data-dlc-tags="set revival">
+        // 検索インデックス（セル内テキスト）には載らないため、検索ボックスの挙動を汚さない。
+        // 描画のたびにDOMを走査しないよう、初期化時に一度だけ 行ノード → タグSet のMapを作る。
+        var tagMap = new WeakMap();
+        $('#dlcTable tbody tr').each(function() {
+            var raw = this.getAttribute('data-dlc-tags') || '';
+            var tags = raw.split(/\s+/).filter(function(t) { return t.length > 0; });
+            tagMap.set(this, new Set(tags));
+        });
+
+        function hasTag(tr, tag) {
+            var tags = tr ? tagMap.get(tr) : null;
+            return !!(tags && tags.has(tag));
+        }
+
+        // 「セット除外」スイッチの参照と状態復元
+        var $excludeSet = $('#excludeSetSwitch');
+        try {
+            $excludeSet.prop('checked', localStorage.getItem(EXCLUDE_SET_KEY) === '1');
+        } catch (e) { /* 失敗時はデフォルト（OFF）のまま */ }
+
         // ===== カスタム検索フィルター：購入済み行の表示/非表示を制御 =====
         // 初期化前に登録しておく（最初の描画時から効かせるため）。#dlcTable のみに適用。
         $.fn.dataTable.ext.search.push(function(settings, searchData, dataIndex) {
@@ -7314,6 +7378,15 @@
             var id = tr ? tr.getAttribute('data-dlc-id') : null;
             // 購入済みなら隠す（未購入だけを表示）
             return !(id !== null && purchasedSet.has(id));
+        });
+
+        // ===== カスタム検索フィルター：セット商品の除外 =====
+        // 検索ボックスの正規表現には手を出さず独立したフィルターとして積む。
+        // これにより AND/OR 切り替え・キャラボタン・購入済みフィルターと干渉せずAND結合される。
+        $.fn.dataTable.ext.search.push(function(settings, searchData, dataIndex) {
+            if (settings.nTable.id !== 'dlcTable') return true;   // 他テーブルには干渉しない
+            if (!$excludeSet.prop('checked')) return true;        // 「セット除外」OFF → 全件通す
+            return !hasTag(settings.aoData[dataIndex].nTr, 'set');
         });
 
         // ===== DataTables 初期化 =====
@@ -7354,6 +7427,14 @@
         // ===== フィルター切り替え =====
         $showPurchased.on('change', function() {
             try { localStorage.setItem(FILTER_KEY, this.checked ? '1' : '0'); } catch (e) {}
+            var y = window.scrollY;   // スクロール位置を退避
+            table.draw(false);        // ページ位置を保持して再描画
+            window.scrollTo(0, y);    // 再描画で動いたスクロール位置を戻す
+        });
+
+        // ===== セット除外の切り替え =====
+        $excludeSet.on('change', function() {
+            try { localStorage.setItem(EXCLUDE_SET_KEY, this.checked ? '1' : '0'); } catch (e) {}
             var y = window.scrollY;   // スクロール位置を退避
             table.draw(false);        // ページ位置を保持して再描画
             window.scrollTo(0, y);    // 再描画で動いたスクロール位置を戻す
